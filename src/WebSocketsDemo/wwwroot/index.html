@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Bootstrap 101 Template</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>
+        var webSocket;
+        $().ready(function () {
+            webSocket = new WebSocket("ws://localhost:5000");
+            webSocket.onopen = function () {
+                $("#spanStatus").text("connected");
+            };
+            webSocket.onmessage = function (evt) {
+                $("#spanStatus").text(evt.data);
+            };
+            webSocket.onerror = function (evt) {
+                alert(evt.message);
+            };
+            webSocket.onclose = function () {
+                $("#spanStatus").text("disconnected");
+            };
+            $("#btnSend").click(function () {
+                if (webSocket.readyState === WebSocket.OPEN) {
+                    webSocket.send($("#textInput").val());
+                }
+                else {
+                    $("#spanStatus").text("Connection is closed");
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <label>Enter Message </label><input type="text" id="textInput" /><button id="btnSend">Send</button>
+    <span id="spanStatus"></span>
+</body>
+
+</html>
