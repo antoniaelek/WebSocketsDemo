@@ -10,23 +10,46 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script>
         var webSocket;
+        var usrName;
+        var wsUri = "ws://localhost:5000/api/values";
         $().ready(function () {
-            webSocket = new WebSocket("ws://localhost:5000");
+            $("#nameStatus").text("Enter a name to send a message");
+            document.getElementById("btnSend").disabled = true;
+
+            webSocket = new WebSocket(wsUri);
             webSocket.onopen = function () {
-                $("#spanStatus").text("connected");
+                $("#spanStatus").text("Connected");
             };
+
             webSocket.onmessage = function (evt) {
-                $("#spanStatus").text(evt.data);
+                var table = document.getElementById("conv");
+                var row = table.insertRow(0);
+                var msg = row.insertCell(0);
+                msg.innerHTML = evt.data;
             };
             webSocket.onerror = function (evt) {
-                alert(evt.message);
+                $("#spanStatus").text(evt.message);
             };
             webSocket.onclose = function () {
-                $("#spanStatus").text("disconnected");
+                $("#spanStatus").text("Disconnected");
             };
+
+            $("#nameSet").click(function () {
+                usrName = $("#nameInput").val();
+                if (usrName === null || usrName === "") {
+                    $("#nameStatus").text("Enter a name");
+                }
+                else {
+                    document.getElementById("nameInput").disabled = true;
+                    $("#nameStatus").text("");
+                    document.getElementById("btnSend").disabled = false;
+                }
+            });
+
             $("#btnSend").click(function () {
                 if (webSocket.readyState === WebSocket.OPEN) {
-                    webSocket.send($("#textInput").val());
+                    webSocket.send("<b>" + usrName + ": " + "</b>" + $("#textInput").val());
+                    $("#textInput").val("");
                 }
                 else {
                     $("#spanStatus").text("Connection is closed");
@@ -37,8 +60,24 @@
 </head>
 
 <body>
-    <label>Enter Message </label><input type="text" id="textInput" /><button id="btnSend">Send</button>
-    <span id="spanStatus"></span>
+<table>
+    <tr>
+        <td><label>Name </label></td>
+        <td><input type="text" id="nameInput"/></td>
+        <td><button id="nameSet">Set</button></td>
+        <td><span id="nameStatus"></span></td>
+    </tr>
+    <tr>
+        <td><label>Message </label></td>
+        <td><input type="text" id="textInput" /></td>
+        <td><button id="btnSend">Send</button></td>
+        <td><span id="spanStatus"></span></td>
+    </tr>
+</table>
+    <hr/>
+<table id="conv">
+    <tr><td></td><td></td></tr>
+</table>
 </body>
 
 </html>

@@ -35,7 +35,7 @@ namespace WebSocketsDemo.Middlewares
                 while (webSocket.State == WebSocketState.Open)
                 {
                     var token = CancellationToken.None;
-                    var buffer = new ArraySegment<Byte>(new Byte[4096]);
+                    var buffer = new ArraySegment<byte>(new byte[4096]);
                     var received = await webSocket.ReceiveAsync(buffer, token);
 
                     switch (received.MessageType)
@@ -45,8 +45,8 @@ namespace WebSocketsDemo.Middlewares
                                                     buffer.Offset,
                                                     buffer.Count);
                             var type = WebSocketMessageType.Text;
-                            var data = Encoding.UTF8.GetBytes("Echo from server: " + request);
-                            buffer = new ArraySegment<Byte>(data);
+                            var data = Encoding.UTF8.GetBytes(request);
+                            buffer = new ArraySegment<byte>(data);
 
                             foreach (var socket in _webSocketCollection)
                             {
